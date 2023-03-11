@@ -1,7 +1,6 @@
 package edu.libot;
 
 import edu.libot.components.BotCommands;
-import edu.libot.components.Buttons;
 import edu.libot.config.BotConfig;
 import edu.libot.response.BookListResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -19,10 +19,10 @@ import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Component
-public class CounterTelegramBot extends TelegramLongPollingBot implements BotCommands {
+public class LibraryTelegramBot extends TelegramLongPollingBot implements BotCommands {
     final BotConfig config;
 
-    public CounterTelegramBot(BotConfig config) {
+    public LibraryTelegramBot(BotConfig config) {
         this.config = config;
         try {
             this.execute(new SetMyCommands(LIST_OF_COMMANDS, new BotCommandScopeDefault(), null));
@@ -48,11 +48,19 @@ public class CounterTelegramBot extends TelegramLongPollingBot implements BotCom
             long chatId = update.getMessage().getChatId();
             String memberName = update.getMessage().getFrom().getFirstName();
 
-            switch (messageText) {
-                case "/start" -> startBot(chatId, memberName);
-                case "/all" -> allBook(chatId);
-                case "/find" -> findBook(chatId);
-                default -> log.info("Unexpected message");
+            if (messageText.contains("/start")) {
+                /* output buttons */
+                startBot(chatId, memberName);
+            } else if (messageText.contains("/find")) {
+                /* post find query and print data */
+                String[] params = messageText.split("/");
+                String query = params[params.length - 1];
+                findBook(chatId, query);
+            } else if (messageText.contains("/all")) {
+                /* print all books */
+                allBook(chatId);
+            } else {
+                log.info("Unexpected message");
             }
         }
     }
@@ -75,10 +83,15 @@ public class CounterTelegramBot extends TelegramLongPollingBot implements BotCom
 
     }
 
-    private void findBook(long chatId) {
+    private void findBook(long chatId, String query) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText("Input the book data");
+        System.out.println(query);
+        ResponseEntity<BookListResponse> responseEntity = new RestTemplate().getForEntity(
+                "http://localhost:8080/api/v1/book/find/" + query, BookListResponse.class
+        );
+        System.out.println(responseEntity.getBody().getData().toString());
+        message.setText(responseEntity.getBody().getData().toString());
 
         try {
             execute(message);
@@ -91,8 +104,8 @@ public class CounterTelegramBot extends TelegramLongPollingBot implements BotCom
     private void startBot(long chatId, String userName) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText("Hi, " + userName + "! I'm a Telegram bot.'");
-        message.setReplyMarkup(Buttons.inlineMarkup());
+        message.setText("Hi, " + userName + "! I'm a Telegram bot.'" + "\n" +
+                "This is my commands: \n" + LIST_OF_COMMANDS);
 
         try {
             execute(message);
@@ -112,19 +125,6 @@ public class CounterTelegramBot extends TelegramLongPollingBot implements BotCom
             log.info("Reply sent");
         } catch (TelegramApiException e) {
             log.error(e.getMessage());
-        }
-    }
-
-    private void botAnswerUtils(String receivedMessage, long chatId, String userName) {
-        switch (receivedMessage) {
-            case "/start":
-                startBot(chatId, userName);
-                break;
-            case "/help":
-                sendHelpText(chatId, HELP_TEXT);
-                break;
-            default:
-                break;
         }
     }
 }

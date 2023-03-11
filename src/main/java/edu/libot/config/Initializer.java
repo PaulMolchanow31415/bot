@@ -1,7 +1,7 @@
 package edu.libot.config;
 
 
-import edu.libot.CounterTelegramBot;
+import edu.libot.LibraryTelegramBot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -16,7 +16,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Component
 public class Initializer {
     @Autowired
-    CounterTelegramBot bot;
+    LibraryTelegramBot bot;
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() {
