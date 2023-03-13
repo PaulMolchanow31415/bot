@@ -16,9 +16,9 @@ public class AuthorEntity {
 
     @Override
     public String toString() {
-        return "АВТОР: \n" +
-                "имя: " + name + "\n" +
-                "фамилия: " + surname + "\n" +
-                "отчество: " + patronymic + "\n";
+        return "\nАВТОР: \n" +
+                "   имя: " + name + "\n" +
+                "   фамилия: " + surname + "\n" +
+                "   отчество: " + patronymic + "\n";
     }
 }

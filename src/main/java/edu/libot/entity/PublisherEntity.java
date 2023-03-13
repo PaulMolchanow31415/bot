@@ -15,8 +15,8 @@ public class PublisherEntity {
 
     @Override
     public String toString() {
-        return "ИЗДАТЕЛЬСТВО: \n" +
-                "название: " + name + "\n" +
-                "город: " + city + "\n";
+        return "\nИЗДАТЕЛЬСТВО: \n" +
+                "   название: " + name + "\n" +
+                "   город: " + city + "\n";
     }
 }

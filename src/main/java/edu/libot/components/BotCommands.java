@@ -8,8 +8,7 @@ public interface BotCommands {
     List<BotCommand> LIST_OF_COMMANDS = List.of(
             new BotCommand("/start", "start bot"),
             new BotCommand("/all", "print all books"),
-            new BotCommand("/find", "find books"),
-            new BotCommand("/help", "bot info")
+            new BotCommand("/find", "find books")
     );
 
 
@@ -17,6 +16,6 @@ public interface BotCommands {
             "The following commands are available to you:\n\n" +
             "/start - starting bot\n" +
             "/all - printing all books\n" +
-            "/find/{query} - print all books look like query\n" +
-            "/help - help commands";
+            "/find/{query} - print all books look like query\n";
+
 }
